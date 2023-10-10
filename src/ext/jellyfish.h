@@ -37,9 +37,9 @@ typedef struct CrystalString
 } CrystalString;
 
 // Compiler branching hint
-#define bindgen_likely(x) __builtin_expect(!!(x), 1)
+#define likely(x) __builtin_expect(!!(x), 1)
 
-static __attribute__((noreturn)) void bindgen_fatal_panic(const char *message)
+static __attribute__((noreturn)) void fatal_panic(const char *message)
 {
   fprintf(stderr, "Fatal error in bindings: %s\n", message);
   abort();
@@ -149,7 +149,24 @@ extern "C"
 
   JSValue getException(JSContext *context);
 
-  CrystalString valueToCrystalString(JSContext *context, JSValue value);
+  /* Convert JSValue to native values */
+  const char *valueToString(JSContext *context, JSValue value);
+  bool valueToBoolean(JSContext *context, JSValue value);
+  double valueToFloat64(JSContext *context, JSValue value);
+  int valueToInt32(JSContext *context, JSValue value);
+  int64_t valueToInt64(JSContext *context, JSValue value);
+
+  /* Convert native values to JSValue */
+  JSValue stringToJsValue(JSContext *context, const char *str);
+  JSValue booleanToJsValue(JSContext *context, int val);
+  JSValue float64ToJsValue(JSContext *context, double d);
+  JSValue int32ToJsValue(JSContext *context, int val);
+  JSValue int64ToJsValue(JSContext *context, int64_t val);
+
+  /* Free allocated memory */
+  void freeRuntime(JSRuntime *runtime);
+  void freeContext(JSContext *context);
+  void freeValue(JSContext *context, JSValue value);
 }
 #endif // __cplusplus
 #endif // JELLYFISH_H
